@@ -6,7 +6,7 @@ if (!vaultPath) throw new Error('must provide vault path');
 const configFile = fs.readFileSync('./config.json', 'utf-8');
 const config = JSON.parse(configFile);
 
-const { source, destination, prefix } = config;
+const { source, destination } = config;
 const sourcePath = `${vaultPath}/${source}`;
 const destPath = `${vaultPath}/${destination}`;
 

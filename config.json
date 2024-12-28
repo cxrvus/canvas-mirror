@@ -1,5 +1,4 @@
 {
 	"source": "Canvas",
-	"destination": "Canvas/Info",
-	"prefix": "info"
+	"destination": "Canvas/Info"
 }
