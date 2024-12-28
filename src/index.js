@@ -23,8 +23,6 @@ const canvases  = sourceFileNames
 ;
 
 const sidecars = canvases.map(({ name, nodes }) => {
-	const sidecar = [];
-
 	const cardNodes = nodes.filter(node => node.type == 'text');
 	const cardTexts = cardNodes.map(node => node.text);
 
@@ -78,6 +76,10 @@ const fmtSidecar = self => [
 	].join('\n\n') + '\n'
 ;
 
+// purge previous sidecars
+fs.readdirSync(destPath).forEach(file => fs.rmSync(`${destPath}/${file}`));
+
+// create new sidecars
 sidecars.forEach(sidecar => {
 	const name = sidecar.name.replace('.canvas', '');
 	const path = `${destPath}/${name}.md`
@@ -85,6 +87,3 @@ sidecars.forEach(sidecar => {
 
 	fs.writeFileSync(path, content);
 })
-
-// todo: timestamp prop
-// todo: clear previous sidecars from specified folder
