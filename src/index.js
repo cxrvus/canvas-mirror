@@ -26,6 +26,13 @@ const sidecars = canvases.map(({ name, nodes }) => {
 	const cardNodes = nodes.filter(node => node.type == 'text');
 	const cardTexts = cardNodes.map(node => node.text);
 
+	const linkPattern = /\[\[.*?\]\]|\(.*?\)\[.*?\]/g;
+	const cardLinks = cardTexts
+		.map(text => text.match(linkPattern))
+		.filter(matches => matches)
+		.flat()
+	;
+
 	const refNodes = nodes.filter(node => node.type == 'file');
 	const refPaths = refNodes.map(node => node.file);
 
@@ -33,14 +40,6 @@ const sidecars = canvases.map(({ name, nodes }) => {
 		.map(path => path.replace(/^.*\//, ''))
 		.map(name => `[[${name}]]`)
 		.map(link => link.replace('.md', ''))
-	;
-
-	const linkPattern = /\[\[.*?\]\]|\(.*?\)\[.*?\]/g;
-
-	const cardLinks = cardTexts
-		.map(text => text.match(linkPattern))
-		.filter(matches => matches)
-		.flat()
 	;
 
 	const rawOutgoingLinks = [...cardLinks, ...refLinks];
