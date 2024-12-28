@@ -67,6 +67,7 @@ const sidecars = canvases.map(({ name, nodes }) => {
 const fmtSidecar = self => [
 		'---',
 		`canvas: "[[${self.name}]]"`,
+		`timestamp: "${new Date().toISOString()}"`,
 		'---',
 		'## References',
 		self.links.map(link => '- ' + link).join('\n'),
