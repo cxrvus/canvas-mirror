@@ -1,8 +1,11 @@
 import * as fs from 'fs';
 
+// todo: migrate to ts
+
 const vaultPath = process.argv[2];
 if (!vaultPath) throw new Error('must provide vault path');
 
+// todo: use plugin settings
 const configFile = fs.readFileSync('./config.json', 'utf-8');
 const config = JSON.parse(configFile);
 
@@ -12,6 +15,7 @@ const destPath = `${vaultPath}/${destination}`;
 
 const sourceFileNames = fs.readdirSync(sourcePath);
 
+// todo: wrap everything in function
 const canvases  = sourceFileNames
 	.filter(name => name.endsWith('.canvas'))
 	.map(name => (
