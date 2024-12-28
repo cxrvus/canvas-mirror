@@ -2,7 +2,7 @@
 	"name": "canvas-info-md",
 	"version": "1.0.0",
 	"description": "A plugin that generates markdown sidecar files for you canvas files.",
-	"main": "main.js",
+	"main": "src/main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
