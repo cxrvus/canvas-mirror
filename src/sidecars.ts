@@ -19,7 +19,11 @@ type Sidecar = {
 }
 
 export const generateSidecars = async (vault: Vault, settings: CanvasInfoSettings) => {
-	const { source, destination } = settings;
+	const { folders } = settings;
+
+	if (Object.values(folders).some(x => !x)) throw new Error('please set all folders in you settings');
+
+	const { source, destination } = folders;
 
 	const sourceFiles = vault.getFolderByPath(source)?.children ?? [];
 	const canvases: Canvas[] = await Promise.all(sourceFiles
