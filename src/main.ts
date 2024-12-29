@@ -1,7 +1,5 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, SettingTab } from 'obsidian';
+import { App, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { generateSidecars } from './sidecars';
-
-// Remember to rename these classes and interfaces!
 
 export interface CanvasInfoSettings {
 	folders: {
@@ -25,17 +23,12 @@ export default class CanvasInfoPlugin extends Plugin {
 
 		const ribbonIconEl = this.addRibbonIcon('car', 'Generate Sidecars', () => this.generateSidecars());
 
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
-
-		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
 			id: 'generate-sidecars',
 			name: 'Generate Sidecars',
 			callback: () => this.generateSidecars()
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 	}
 
