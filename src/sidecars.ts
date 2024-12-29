@@ -1,5 +1,10 @@
-import * as fs from 'fs';
+import { Vault } from 'obsidian';
 import { CanvasInfoSettings } from './main';
+
+interface Canvas {
+	name: string,
+	nodes: Node[],
+}
 
 interface Node {
 	type: 'text' | 'file'
@@ -13,25 +18,24 @@ type Sidecar = {
 	text: string,
 }
 
-export const generateSidecars = (settings: CanvasInfoSettings, vaultPath: string) => {
+export const generateSidecars = async (vault: Vault, settings: CanvasInfoSettings) => {
 	const { source, destination } = settings;
 
-	const sourcePath = `${vaultPath}/${source}`;
-	const destPath = `${vaultPath}/${destination}`;
+	const sourceFiles = vault.getFolderByPath(source)?.children ?? [];
+	const canvases: Canvas[] = await Promise.all(sourceFiles
+		.filter(abstractFile => abstractFile.name.endsWith('.canvas'))
+		.map(async abstractFile => {
+			const file = vault.getFileByPath(abstractFile.path);
+			if (!file) throw new Error();
 
-	const sourceFileNames = fs.readdirSync(sourcePath);
-
-	const canvases  = sourceFileNames
-		.filter(name => name.endsWith('.canvas'))
-		.map(name => {
-			const canvas = JSON.parse(fs.readFileSync(`${sourcePath}/${name}`) as unknown as string);
+			const content = await vault.cachedRead(file);
 			return {
-				name,
-				nodes: canvas.nodes as Node[]
+				name: file.name,
+				nodes: JSON.parse(content).nodes
 			}
 		}
 		)
-	;
+	);
 
 	const sidecars: Sidecar[] = canvases.map(({ name, nodes }) => {
 		const cardNodes = nodes.filter(node => node.type == 'text');
@@ -67,29 +71,30 @@ export const generateSidecars = (settings: CanvasInfoSettings, vaultPath: string
 		};
 	});
 
-	const fmtSidecar = (self: Sidecar) => [
-			'---',
-			`canvas: "[[${self.name}]]"`,
-			`timestamp: "${new Date().toISOString()}"`,
-			'---',
-			'## References',
-			self.links.map(link => '- ' + link).join('\n'),
-			'## Text',
-			'```',
-			self.text,
-			'```',
-		].join('\n\n') + '\n'
-	;
+	// todo: prefix with timestamp and move to archive instead of deleting
+	const destDir = vault.getFolderByPath(destination);
+	const oldFiles = destDir?.children?.filter(file => file.name.endsWith('.md')) ?? [];
+	oldFiles.forEach(async file => await vault.delete(file));
 
-	// purge previous sidecars
-	fs.readdirSync(destPath).forEach(file => fs.rmSync(`${destPath}/${file}`));
-
-	// create new sidecars
 	sidecars.forEach(sidecar => {
 		const name = sidecar.name.replace('.canvas', '');
-		const path = `${destPath}/${name}.md`
+		const path = `${destination}/${name}.md`
 		const content = fmtSidecar(sidecar);
 
-		fs.writeFileSync(path, content);
+		vault.create(path, content);
 	})
 }
+
+const fmtSidecar = (self: Sidecar) => [
+		'---',
+		`canvas: "[[${self.name}]]"`,
+		`timestamp: "${new Date().toISOString()}"`,
+		'---',
+		'## References',
+		self.links.map(link => '- ' + link).join('\n'),
+		'## Text',
+		'```',
+		self.text,
+		'```',
+	].join('\n\n') + '\n'
+;
