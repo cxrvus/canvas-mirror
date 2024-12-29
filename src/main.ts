@@ -1,4 +1,5 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { generateSidecars } from './sidecars';
 
 // Remember to rename these classes and interfaces!
 
@@ -46,9 +47,9 @@ export default class CanvasInfoPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	generateSidecars() {
+	async generateSidecars() {
 		new Notice('generating sidecars…');
-		// todo: call the actual function
+		await generateSidecars(this.app.vault, this.settings);
 	}
 }
 
