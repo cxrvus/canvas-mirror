@@ -19,7 +19,7 @@ export default class CanvasInfoPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		const ribbonIconEl = this.addRibbonIcon('car', 'Generate Sidecars', this.generateSidecars);
+		const ribbonIconEl = this.addRibbonIcon('car', 'Generate Sidecars', () => this.generateSidecars());
 
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
@@ -28,7 +28,7 @@ export default class CanvasInfoPlugin extends Plugin {
 		this.addCommand({
 			id: 'generate-sidecars',
 			name: 'Generate Sidecars',
-			callback: this.generateSidecars
+			callback: () => this.generateSidecars()
 		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
