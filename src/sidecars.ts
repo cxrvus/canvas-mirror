@@ -15,7 +15,16 @@ interface Node {
 type Sidecar = {
 	name: string,
 	links: string[],
+	tags: string[],
 	text: string,
+}
+
+const getMatches = (strings: string[], pattern: RegExp): string[] => {
+	return strings
+		.map(str => str.match(pattern) || '')
+		.filter(matches => matches)
+		.flat()
+	;
 }
 
 export const generateSidecars = async (vault: Vault, settings: CanvasInfoSettings) => {
@@ -41,18 +50,15 @@ export const generateSidecars = async (vault: Vault, settings: CanvasInfoSetting
 		)
 	);
 
-	// todo: include tags
-
 	const sidecars: Sidecar[] = canvases.map(({ name, nodes }) => {
 		const cardNodes = nodes.filter(node => node.type == 'text');
 		const cardTexts = cardNodes.map(node => node.text);
 
+		const tagPattern = /#[a-z_\/]+/g;
+		const tags = getMatches(cardTexts, tagPattern);
+
 		const linkPattern = /\[\[.*?\]\]|\(.*?\)\[.*?\]/g;
-		const cardLinks = cardTexts
-			.map(text => text.match(linkPattern) || '')
-			.filter(matches => matches)
-			.flat()
-		;
+		const cardLinks = getMatches(cardTexts, linkPattern);
 
 		const refNodes = nodes.filter(node => node.type == 'file');
 		const refPaths = refNodes.map(node => node.file);
@@ -72,6 +78,7 @@ export const generateSidecars = async (vault: Vault, settings: CanvasInfoSetting
 
 		return {
 			name,
+			tags,
 			links: outgoingLinks,
 			text: textContent,
 		};
@@ -120,13 +127,16 @@ export const toggleSidecars = async (vault: Vault, pluginSettings: CanvasInfoSet
 	return enabled;
 }
 
+// todo: more modularity using a *section()* function
 const fmtSidecar = (self: Sidecar) => [
 		'---',
 		`canvas: "[[${self.name}]]"`,
 		`timestamp: "${new Date().toISOString()}"`,
 		'---',
-		'## References',
+		'## Links',
 		self.links.map(link => '- ' + link).join('\n'),
+		'## Tags',
+		self.tags.map(tag => '- ' + tag).join('\n'),
 		'## Text',
 		'```',
 		self.text,
