@@ -41,6 +41,8 @@ export const generateSidecars = async (vault: Vault, settings: CanvasInfoSetting
 		)
 	);
 
+	// todo: include tags
+
 	const sidecars: Sidecar[] = canvases.map(({ name, nodes }) => {
 		const cardNodes = nodes.filter(node => node.type == 'text');
 		const cardTexts = cardNodes.map(node => node.text);
