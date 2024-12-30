@@ -1,5 +1,5 @@
 import { App, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { generateSidecars } from './sidecars';
+import * as sidecars from './sidecars';
 
 export interface CanvasInfoSettings {
 	folders: {
@@ -21,12 +21,20 @@ export default class CanvasInfoPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		const ribbonIconEl = this.addRibbonIcon('car', 'Generate Sidecars', () => this.generateSidecars());
+		this.addRibbonIcon('car', 'Generate Sidecars', () => this.generateSidecars());
 
 		this.addCommand({
 			id: 'generate-sidecars',
 			name: 'Generate Sidecars',
 			callback: () => this.generateSidecars()
+		});
+
+		this.addRibbonIcon('trash', 'Clear Sidecars', () => this.clearSidecars());
+
+		this.addCommand({
+			id: 'clear-sidecars',
+			name: 'Clear Sidecars',
+			callback: () => this.clearSidecars()
 		});
 
 		this.addSettingTab(new SampleSettingTab(this.app, this));
@@ -47,7 +55,16 @@ export default class CanvasInfoPlugin extends Plugin {
 	async generateSidecars() {
 		new Notice('generating sidecars…');
 		try {
-			await generateSidecars(this.app.vault, this.settings);
+			await sidecars.generateSidecars(this.app.vault, this.settings);
+		} catch(e) {
+			new Notice(e);
+		}
+	}
+
+	async clearSidecars() {
+		new Notice('clearing sidecars…');
+		try {
+			await sidecars.clearSidecars(this.app.vault, this.settings);
 		} catch(e) {
 			new Notice(e);
 		}

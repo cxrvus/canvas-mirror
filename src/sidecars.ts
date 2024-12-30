@@ -75,10 +75,7 @@ export const generateSidecars = async (vault: Vault, settings: CanvasInfoSetting
 		};
 	});
 
-	// todo: prefix with timestamp and move to archive instead of deleting
-	const destDir = vault.getFolderByPath(destination);
-	const oldFiles = destDir?.children?.filter(file => file.name.endsWith('.md')) ?? [];
-	oldFiles.forEach(async file => await vault.delete(file));
+	await clearSidecars(vault, settings);
 
 	sidecars.forEach(sidecar => {
 		const name = sidecar.name.replace('.canvas', '');
@@ -87,6 +84,13 @@ export const generateSidecars = async (vault: Vault, settings: CanvasInfoSetting
 
 		vault.create(path, content);
 	})
+}
+
+export const clearSidecars = async (vault: Vault, settings: CanvasInfoSettings) => {
+	// idea: prefix with timestamp and move to archive instead of deleting
+	const destDir = vault.getFolderByPath(settings.folders.destination);
+	const oldFiles = destDir?.children?.filter(file => file.name.endsWith('.md')) ?? [];
+	oldFiles.forEach(async file => await vault.delete(file));
 }
 
 const fmtSidecar = (self: Sidecar) => [
