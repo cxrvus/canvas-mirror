@@ -89,10 +89,35 @@ export const generateSidecars = async (vault: Vault, settings: CanvasInfoSetting
 }
 
 export const clearSidecars = async (vault: Vault, settings: CanvasInfoSettings) => {
-	// idea: prefix with timestamp and move to archive instead of deleting
 	const destDir = vault.getFolderByPath(settings.folders.destination);
 	const oldFiles = destDir?.children?.filter(file => file.name.endsWith('.md')) ?? [];
 	oldFiles.forEach(async file => await vault.delete(file));
+}
+
+interface AppSettings {
+	userIgnoreFilters: string[]
+}
+
+export const toggleSidecars = async (vault: Vault, pluginSettings: CanvasInfoSettings): Promise<boolean> => {
+	const { destination } = pluginSettings.folders;
+
+	const settingsPath = `${vault.configDir}/app.json`;
+	const appSettings = JSON.parse(await vault.adapter.read(settingsPath)) as AppSettings;
+
+	if (!appSettings.userIgnoreFilters) appSettings.userIgnoreFilters = [];
+
+	let enabled = false;
+
+	if (appSettings.userIgnoreFilters.includes(destination)) {
+		appSettings.userIgnoreFilters.remove(destination)
+		enabled = true;
+	} else {
+		appSettings.userIgnoreFilters.push(destination)
+	}
+
+	await vault.adapter.write(settingsPath, JSON.stringify(appSettings));
+
+	return enabled;
 }
 
 const fmtSidecar = (self: Sidecar) => [

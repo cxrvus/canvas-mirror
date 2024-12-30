@@ -29,7 +29,13 @@ export default class CanvasInfoPlugin extends Plugin {
 			callback: () => this.generateSidecars()
 		});
 
-		this.addRibbonIcon('trash', 'Clear Sidecars', () => this.clearSidecars());
+		this.addRibbonIcon('folder', 'Toggle Sidecars', () => this.toggleSidecars());
+
+		this.addCommand({
+			id: 'toggle-sidecars',
+			name: 'Toggle Sidecar Exclusion',
+			callback: () => this.toggleSidecars()
+		});
 
 		this.addCommand({
 			id: 'clear-sidecars',
@@ -56,6 +62,16 @@ export default class CanvasInfoPlugin extends Plugin {
 		new Notice('generating sidecars…');
 		try {
 			await sidecars.generateSidecars(this.app.vault, this.settings);
+		} catch(e) {
+			new Notice(e);
+		}
+	}
+
+	async toggleSidecars() {
+		try {
+			const enabled = await sidecars.toggleSidecars(this.app.vault, this.settings);
+			const status = enabled ? "enabled" : "disabled"
+			new Notice(`sidecars ${status}`)
 		} catch(e) {
 			new Notice(e);
 		}
