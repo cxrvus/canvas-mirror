@@ -55,7 +55,7 @@ export const generateSidecars = async (vault: Vault, settings: CanvasInfoSetting
 		const cardTexts = cardNodes.map(node => node.text);
 
 		const tagPattern = /#[a-z_\/]+/g;
-		const linkPattern = /\[\[.*?\]\]|\(.*?\)\[.*?\]/g;
+		const linkPattern = /\[\[.*?\]\]|\[.*?\]\(.*?\)/g;
 
 		const sanitizedTexts = cardTexts.map(x => x.replace(linkPattern, ''));
 		const tags = getMatches(sanitizedTexts, tagPattern);
