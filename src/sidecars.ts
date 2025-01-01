@@ -52,7 +52,7 @@ export const generateSidecars = async (vault: Vault, settings: CanvasInfoSetting
 
 	const sidecars: Sidecar[] = canvases.map(({ name, nodes }) => {
 		const cardNodes = nodes.filter(node => node.type == 'text');
-		const cardTexts = cardNodes.map(node => node.text);
+		const cardTexts = cardNodes.map(node => node.text.trim());
 
 		const tagPattern = /#[a-z_\/]+/g;
 		const linkPattern = /\[\[.*?\]\]|\[.*?\]\(.*?\)/g;
@@ -77,7 +77,7 @@ export const generateSidecars = async (vault: Vault, settings: CanvasInfoSetting
 		const outgoingLinks = rawOutgoingLinks.map(links => links.replace('.canvas', ''));
 
 		// todo: instead of inserting content into a code block, properly display text by generating headers that can be referenced by other files
-		const textContent = cardTexts.join('\n\n\n');
+		const textContent = cardTexts.join('\n\n');
 
 		return {
 			name,
@@ -131,19 +131,11 @@ export const toggleSidecars = async (vault: Vault, pluginSettings: CanvasInfoSet
 	return enabled;
 }
 
-// todo: more modularity using a *section()* function
-const fmtSidecar = (self: Sidecar) => [
-		'---',
-		`canvas: "[[${self.name}]]"`,
-		`timestamp: "${new Date().toISOString()}"`,
-		'---',
-		'## Links',
-		self.links.map(link => '- ' + link).join('\n'),
-		'## Tags',
-		self.tags.map(tag => '- ' + tag).join('\n'),
-		'## Text',
-		'```',
-		self.text,
-		'```',
-	].join('\n\n') + '\n'
-;
+const fmtSidecar = (self: Sidecar) => {
+	return `\
+---
+canvas: "[[${self.name}]]"
+---
+${self.text.replace(/\.canvas/g, '')}
+`;
+}
