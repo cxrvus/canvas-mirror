@@ -94,6 +94,7 @@ export const generateSidecars = async (vault: Vault, settings: CanvasInfoSetting
 		const path = `${destination}/${name}.md`
 		const content = fmtSidecar(sidecar);
 
+		// todo: fix Obsidian's indexing error
 		vault.create(path, content);
 	})
 }
