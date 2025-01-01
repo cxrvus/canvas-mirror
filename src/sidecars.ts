@@ -55,9 +55,12 @@ export const generateSidecars = async (vault: Vault, settings: CanvasInfoSetting
 		const cardTexts = cardNodes.map(node => node.text);
 
 		const tagPattern = /#[a-z_\/]+/g;
-		const tags = getMatches(cardTexts, tagPattern);
-
 		const linkPattern = /\[\[.*?\]\]|\(.*?\)\[.*?\]/g;
+
+		const sanitizedTexts = cardTexts.map(x => x.replace(linkPattern, ''));
+		// fixme: exclude tag pattern matches that are included in links
+		const tags = getMatches(sanitizedTexts, tagPattern);
+
 		const cardLinks = getMatches(cardTexts, linkPattern);
 
 		const refNodes = nodes.filter(node => node.type == 'file');
@@ -74,6 +77,7 @@ export const generateSidecars = async (vault: Vault, settings: CanvasInfoSetting
 		// for referenced canvas files, link to sidecar files instead
 		const outgoingLinks = rawOutgoingLinks.map(links => links.replace('.canvas', ''));
 
+		// todo: instead of inserting content into a code block, properly display text by generating headers that can be referenced by other files
 		const textContent = cardTexts.join('\n\n\n');
 
 		return {
