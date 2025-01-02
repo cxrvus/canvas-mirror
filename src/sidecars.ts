@@ -131,11 +131,25 @@ export const toggleSidecars = async (vault: Vault, pluginSettings: CanvasInfoSet
 	return enabled;
 }
 
+const bullet = (strings: string[]) => {
+	return `- ${strings.join('\n- ')}`
+}
+
 const fmtSidecar = (self: Sidecar) => {
+	const refs = bullet([self.tags, self.links].flat());
+
 	return `\
 ---
 canvas: "[[${self.name}]]"
 ---
+
+# References
+
+${refs}
+
+# Text
+
 ${self.text.replace(/\.canvas/g, '')}
 `;
+
 }
