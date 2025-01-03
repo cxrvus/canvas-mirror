@@ -76,7 +76,6 @@ export const generateSidecars = async (vault: Vault, settings: CanvasInfoSetting
 		// for referenced canvas files, link to sidecar files instead
 		const outgoingLinks = rawOutgoingLinks.map(links => links.replace('.canvas', ''));
 
-		// todo: instead of inserting content into a code block, properly display text by generating headers that can be referenced by other files
 		const textContent = cardTexts.join('\n\n');
 
 		return {
@@ -94,6 +93,7 @@ export const generateSidecars = async (vault: Vault, settings: CanvasInfoSetting
 		const path = `${destination}/${name}.md`
 		const content = fmtSidecar(sidecar);
 
+		// todo: only create sidecars where necessary (source has been modified)
 		// todo: fix Obsidian's indexing error
 		vault.create(path, content);
 	})
