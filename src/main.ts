@@ -1,22 +1,22 @@
 import { App, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import * as sidecars from './sidecars';
 
-export interface CanvasInfoSettings {
+export interface CanvasMirrorSettings {
 	folders: {
 		source: string;
 		destination: string;
 	}
 }
 
-const DEFAULT_SETTINGS: CanvasInfoSettings = {
+const DEFAULT_SETTINGS: CanvasMirrorSettings = {
 	folders: {
 		source: "",
 		destination: "",
 	}
 }
 
-export default class CanvasInfoPlugin extends Plugin {
-	settings: CanvasInfoSettings;
+export default class CanvasMirrorPlugin extends Plugin {
+	settings: CanvasMirrorSettings;
 
 	async onload() {
 		await this.loadSettings();
@@ -88,9 +88,9 @@ export default class CanvasInfoPlugin extends Plugin {
 }
 
 class SampleSettingTab extends PluginSettingTab {
-	plugin: CanvasInfoPlugin;
+	plugin: CanvasMirrorPlugin;
 
-	constructor(app: App, plugin: CanvasInfoPlugin) {
+	constructor(app: App, plugin: CanvasMirrorPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}

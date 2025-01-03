@@ -1,7 +1,7 @@
 {
-	"name": "canvas-info-md",
+	"name": "canvas-mirror",
 	"version": "1.0.0",
-	"description": "A plugin that generates markdown sidecar files for you canvas files.",
+	"description": "An Obsidian plugin that generates markdown mirror files for you canvas files.",
 	"main": "src/main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",

@@ -1,5 +1,5 @@
 import { Vault } from 'obsidian';
-import { CanvasInfoSettings } from './main';
+import { CanvasMirrorSettings } from './main';
 
 interface Canvas {
 	name: string,
@@ -27,7 +27,7 @@ const getMatches = (strings: string[], pattern: RegExp): string[] => {
 	;
 }
 
-export const generateSidecars = async (vault: Vault, settings: CanvasInfoSettings) => {
+export const generateSidecars = async (vault: Vault, settings: CanvasMirrorSettings) => {
 	const { folders } = settings;
 
 	if (Object.values(folders).some(x => !x)) throw new Error('please set all folders in you settings');
@@ -98,7 +98,7 @@ export const generateSidecars = async (vault: Vault, settings: CanvasInfoSetting
 	})
 }
 
-export const clearSidecars = async (vault: Vault, settings: CanvasInfoSettings) => {
+export const clearSidecars = async (vault: Vault, settings: CanvasMirrorSettings) => {
 	const destDir = vault.getFolderByPath(settings.folders.destination);
 	const oldFiles = destDir?.children?.filter(file => file.name.endsWith('.md')) ?? [];
 	oldFiles.forEach(async file => await vault.delete(file));
@@ -108,7 +108,7 @@ interface AppSettings {
 	userIgnoreFilters: string[]
 }
 
-export const toggleSidecars = async (vault: Vault, pluginSettings: CanvasInfoSettings): Promise<boolean> => {
+export const toggleSidecars = async (vault: Vault, pluginSettings: CanvasMirrorSettings): Promise<boolean> => {
 	const { destination } = pluginSettings.folders;
 
 	const settingsPath = `${vault.configDir}/app.json`;

@@ -1,9 +1,9 @@
 {
-	"id": "canvas-info",
-	"name": "Canvas Info",
+	"id": "canvas-mirror",
+	"name": "Canvas Mirror",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "A plugin that generates markdown sidecar files for you canvas files.",
+	"description": "A plugin that generates markdown mirror files for you canvas files.",
 	"author": "cxrvus",
 	"authorUrl": "https://github.com/cxrvus",
 	"isDesktopOnly": false
