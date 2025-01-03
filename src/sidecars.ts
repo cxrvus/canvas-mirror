@@ -42,12 +42,11 @@ export const generateSidecars = async (vault: Vault, settings: CanvasInfoSetting
 			if (!file) throw new Error();
 
 			const content = await vault.cachedRead(file);
-			return {
-				name: file.name,
-				nodes: JSON.parse(content).nodes
-			}
-		}
-		)
+			const nodes = content ? JSON.parse(content).nodes : [];
+			const { name } = file;
+
+			return { name, nodes }
+		})
 	);
 
 	const sidecars: Sidecar[] = canvases.map(({ name, nodes }) => {
