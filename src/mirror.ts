@@ -12,7 +12,7 @@ interface Node {
 	file: string,
 }
 
-type Sidecar = {
+type Mirror = {
 	name: string,
 	links: string[],
 	tags: string[],
@@ -27,7 +27,7 @@ const getMatches = (strings: string[], pattern: RegExp): string[] => {
 	;
 }
 
-export const generateSidecars = async (vault: Vault, settings: CanvasMirrorSettings) => {
+export const generateMirrors = async (vault: Vault, settings: CanvasMirrorSettings) => {
 	const { folders } = settings;
 
 	if (Object.values(folders).some(x => !x)) throw new Error('please set all folders in you settings');
@@ -49,7 +49,7 @@ export const generateSidecars = async (vault: Vault, settings: CanvasMirrorSetti
 		})
 	);
 
-	const sidecars: Sidecar[] = canvases.map(({ name, nodes }) => {
+	const mirrors: Mirror[] = canvases.map(({ name, nodes }) => {
 		const cardNodes = nodes.filter(node => node.type == 'text');
 		const cardTexts = cardNodes.map(node => node.text.trim());
 
@@ -72,7 +72,7 @@ export const generateSidecars = async (vault: Vault, settings: CanvasMirrorSetti
 
 		const rawOutgoingLinks = [...cardLinks, ...refLinks];
 
-		// for referenced canvas files, link to sidecar files instead
+		// for referenced canvas files, link to mirror files instead
 		const outgoingLinks = rawOutgoingLinks.map(links => links.replace('.canvas', ''));
 
 		const textContent = cardTexts.join('\n\n');
@@ -85,20 +85,20 @@ export const generateSidecars = async (vault: Vault, settings: CanvasMirrorSetti
 		};
 	});
 
-	await clearSidecars(vault, settings);
+	await clearMirrors(vault, settings);
 
-	sidecars.forEach(sidecar => {
-		const name = sidecar.name.replace('.canvas', '');
+	mirrors.forEach(mirror => {
+		const name = mirror.name.replace('.canvas', '');
 		const path = `${destination}/${name}.md`
-		const content = fmtSidecar(sidecar);
+		const content = fmtMirror(mirror);
 
-		// todo: only create sidecars where necessary (source has been modified)
+		// todo: only create mirror files where necessary (source has been modified)
 		// todo: fix Obsidian's indexing error
 		vault.create(path, content);
 	})
 }
 
-export const clearSidecars = async (vault: Vault, settings: CanvasMirrorSettings) => {
+export const clearMirrors = async (vault: Vault, settings: CanvasMirrorSettings) => {
 	const destDir = vault.getFolderByPath(settings.folders.destination);
 	const oldFiles = destDir?.children?.filter(file => file.name.endsWith('.md')) ?? [];
 	oldFiles.forEach(async file => await vault.delete(file));
@@ -108,7 +108,7 @@ interface AppSettings {
 	userIgnoreFilters: string[]
 }
 
-export const toggleSidecars = async (vault: Vault, pluginSettings: CanvasMirrorSettings): Promise<boolean> => {
+export const toggleMirrors = async (vault: Vault, pluginSettings: CanvasMirrorSettings): Promise<boolean> => {
 	const { destination } = pluginSettings.folders;
 
 	const settingsPath = `${vault.configDir}/app.json`;
@@ -134,7 +134,7 @@ const bullet = (strings: string[]) => {
 	return `- ${strings.join('\n- ')}`
 }
 
-const fmtSidecar = (self: Sidecar) => {
+const fmtMirror = (self: Mirror) => {
 	const refs = bullet([self.tags, self.links].flat());
 
 	return `\

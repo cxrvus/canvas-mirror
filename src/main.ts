@@ -1,5 +1,5 @@
 import { App, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import * as sidecars from './sidecars';
+import * as mirror from './mirror';
 
 export interface CanvasMirrorSettings {
 	folders: {
@@ -21,26 +21,26 @@ export default class CanvasMirrorPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		this.addRibbonIcon('car', 'Generate Sidecars', () => this.generateSidecars());
+		this.addRibbonIcon('scan-text', 'Generate Mirror Files', () => this.generateMirrors());
 
 		this.addCommand({
-			id: 'generate-sidecars',
-			name: 'Generate Sidecars',
-			callback: () => this.generateSidecars()
+			id: 'generate-mirrors',
+			name: 'Generate Mirror Files',
+			callback: () => this.generateMirrors()
 		});
 
-		this.addRibbonIcon('folder', 'Toggle Sidecars', () => this.toggleSidecars());
+		this.addRibbonIcon('folder', 'Toggle Mirror Files', () => this.toggleMirrors());
 
 		this.addCommand({
-			id: 'toggle-sidecars',
-			name: 'Toggle Sidecar Exclusion',
-			callback: () => this.toggleSidecars()
+			id: 'toggle-mirrors',
+			name: 'Toggle Mirror File Exclusion',
+			callback: () => this.toggleMirrors()
 		});
 
 		this.addCommand({
-			id: 'clear-sidecars',
-			name: 'Clear Sidecars',
-			callback: () => this.clearSidecars()
+			id: 'clear-mirrors',
+			name: 'Clear Mirror Files',
+			callback: () => this.clearMirrors()
 		});
 
 		this.addSettingTab(new SampleSettingTab(this.app, this));
@@ -58,29 +58,29 @@ export default class CanvasMirrorPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	async generateSidecars() {
-		new Notice('generating sidecars…');
+	async generateMirrors() {
+		new Notice('generating mirrors…');
 		try {
-			await sidecars.generateSidecars(this.app.vault, this.settings);
+			await mirror.generateMirrors(this.app.vault, this.settings);
 		} catch(e) {
 			new Notice(e);
 		}
 	}
 
-	async toggleSidecars() {
+	async toggleMirrors() {
 		try {
-			const enabled = await sidecars.toggleSidecars(this.app.vault, this.settings);
+			const enabled = await mirror.toggleMirrors(this.app.vault, this.settings);
 			const status = enabled ? "enabled" : "disabled"
-			new Notice(`sidecars ${status}`)
+			new Notice(`mirrors ${status}`)
 		} catch(e) {
 			new Notice(e);
 		}
 	}
 
-	async clearSidecars() {
-		new Notice('clearing sidecars…');
+	async clearMirrors() {
+		new Notice('clearing mirrors…');
 		try {
-			await sidecars.clearSidecars(this.app.vault, this.settings);
+			await mirror.clearMirrors(this.app.vault, this.settings);
 		} catch(e) {
 			new Notice(e);
 		}
@@ -113,7 +113,7 @@ class SampleSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Destination')
-			.setDesc('the destination folder for your generated sidecar markdown files')
+			.setDesc('the destination folder for your generated markdown mirror files')
 			.addText(folder => folder
 				.setPlaceholder('Destination Folder')
 				.setValue(this.plugin.settings.folders.destination)
