@@ -142,6 +142,8 @@ const fmtMirror = (self: Mirror) => {
 canvas: "[[${self.name}]]"
 ---
 
+#mirror
+
 # References
 
 ${refs}
