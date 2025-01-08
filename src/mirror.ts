@@ -13,6 +13,7 @@ interface Node {
 }
 
 type Mirror = {
+	nodes: Node[],
 	name: string,
 	links: string[],
 	tags: string[],
@@ -83,6 +84,7 @@ export const generateMirrors = async (vault: Vault, settings: CanvasMirrorSettin
 		return {
 			name,
 			tags,
+			nodes,
 			links: outgoingLinks,
 			text: textContent,
 		};
@@ -134,17 +136,23 @@ export const toggleMirrors = async (vault: Vault, pluginSettings: CanvasMirrorSe
 }
 
 const bullet = (strings: string[]) => {
-	return `- ${strings.join('\n- ')}`
+	return strings.length ? `- ${strings.join('\n- ')}` : '*none*';
 }
 
 const fmtMirror = (self: Mirror) => {
-	const refs = bullet([self.tags, self.links].flat());
-
-	return `\
+	const canvasRef = `\
 ---
 canvas: "[[${self.name}]]"
 ---
 
+`;
+
+	if (!self.nodes?.length) return canvasRef + '*empty*';
+
+	const refs = bullet([self.tags, self.links].flat());
+
+return `\
+${canvasRef}
 #mirror
 
 # References
