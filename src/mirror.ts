@@ -27,6 +27,8 @@ const getMatches = (strings: string[], pattern: RegExp): string[] => {
 	;
 }
 
+// todo: increase function uniformity by using a Self parameter
+
 export const generateMirrors = async (vault: Vault, settings: CanvasMirrorSettings) => {
 	const { folders } = settings;
 
