@@ -42,7 +42,8 @@ export const generateMirrors = async (vault: Vault, settings: CanvasMirrorSettin
 			if (!file) throw new Error();
 
 			const content = await vault.cachedRead(file);
-			const nodes = content ? JSON.parse(content).nodes : [];
+			const parsedContent = content ? JSON.parse(content) : {};
+			const nodes = parsedContent.nodes ?? [];
 			const { name } = file;
 
 			return { name, nodes }
