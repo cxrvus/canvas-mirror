@@ -36,6 +36,8 @@ export const generateMirrors = async (vault: Vault, settings: CanvasMirrorSettin
 
 	const { source, destination } = folders;
 
+	if (!vault.getFolderByPath(destination)) vault.createFolder(destination);
+
 	const sourceFiles = vault.getFolderByPath(source)?.children ?? [];
 	const canvases: Canvas[] = await Promise.all(sourceFiles
 		.filter(abstractFile => abstractFile.name.endsWith('.canvas'))
