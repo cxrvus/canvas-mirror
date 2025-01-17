@@ -38,8 +38,12 @@ export const generateMirrors = async (vault: Vault, settings: CanvasMirrorSettin
 	if (!destination) throw new Error('please set all folders in you settings');
 	if (!vault.getFolderByPath(destination)) vault.createFolder(destination);
 
+	const ignored = (await getAppSettings(vault)).userIgnoreFilters;
+	console.log(ignored);
+
 	const sourceFiles = vault.getAllLoadedFiles();
 	const canvases: Canvas[] = await Promise.all(sourceFiles
+		.filter(file => !ignored.some(x => file.path.startsWith(x)))
 		.filter(abstractFile => abstractFile.name.endsWith('.canvas'))
 		.map(async abstractFile => {
 			const file = vault.getFileByPath(abstractFile.path);
