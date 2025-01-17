@@ -12,6 +12,7 @@ interface Node {
 	file: string,
 }
 
+// TODO: parse inline properties
 type Mirror = {
 	nodes: Node[],
 	name: string,
@@ -100,7 +101,7 @@ export const generateMirrors = async (vault: Vault, settings: CanvasMirrorSettin
 		const content = fmtMirror(mirror);
 
 		// todo: only create mirror files where necessary (source has been modified)
-		// todo: fix Obsidian's indexing error
+		// idea: fix Obsidian's indexing error
 		vault.create(path, content);
 	})
 }

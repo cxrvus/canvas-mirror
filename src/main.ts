@@ -100,6 +100,7 @@ class SampleSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
+		// TODO: take the entire vault as the source
 		new Setting(containerEl)
 			.setName('Source')
 			.setDesc('the source folder where your canvas files are located')
