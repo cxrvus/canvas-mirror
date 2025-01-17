@@ -12,13 +12,15 @@ interface Node {
 	file: string,
 }
 
-// TODO: parse inline properties
+type Props = { [key: string]: string};
+
 type Mirror = {
-	nodes: Node[],
 	name: string,
+	nodes: Node[],
+	text: string,
 	links: string[],
 	tags: string[],
-	text: string,
+	props: Props,
 }
 
 const getMatches = (strings: string[], pattern: RegExp): string[] => {
@@ -62,9 +64,21 @@ export const generateMirrors = async (vault: Vault, settings: CanvasMirrorSettin
 
 		const tagPattern = /#[a-z_\/]+/g;
 		const linkPattern = /\[\[.*?\]\]|\[.*?\]\(.*?\)/g;
+		const propPattern = /(\[|\()([a-z-_]+?)::(.+)(\)|\])/g;
 
 		const sanitizedTexts = cardTexts.map(x => x.replace(linkPattern, ''));
 		const tags = getMatches(sanitizedTexts, tagPattern);
+		const propStrings = getMatches(cardTexts, propPattern);
+		
+		const props: Props = {};
+
+		propStrings
+			.map(kvp => kvp.split('::'))
+			.forEach(([k, v]) => {
+				v = v.trim();
+				props[k.substring(1)] = v.substring(0, v.length - 1);
+			})
+		;
 
 		const cardLinks = getMatches(cardTexts, linkPattern);
 
@@ -86,10 +100,11 @@ export const generateMirrors = async (vault: Vault, settings: CanvasMirrorSettin
 
 		return {
 			name,
-			tags,
 			nodes,
-			links: outgoingLinks,
 			text: textContent,
+			links: outgoingLinks,
+			tags,
+			props,
 		};
 	});
 
@@ -143,19 +158,18 @@ const bullet = (strings: string[]) => {
 }
 
 const fmtMirror = (self: Mirror) => {
-	const canvasRef = `\
----
-canvas: "[[${self.name}]]"
----
+	self.props.canvas = `[[${self.name}]]`;
 
-`;
+	// todo: infer actual value types
+	const kvpStrings = Object.entries(self.props).map(([k, v]) => `${k}: "${v}"`);
+	const props = `---\n${kvpStrings.join('\n')}\n---\n\n`;
 
-	if (!self.nodes?.length) return canvasRef + '*empty*';
+	if (!self.nodes?.length) return props + '*empty*';
 
 	const refs = bullet([self.tags, self.links].flat());
 
 return `\
-${canvasRef}
+${props}
 #mirror
 
 # References
