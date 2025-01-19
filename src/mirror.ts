@@ -80,6 +80,7 @@ export const generateMirrors = async (vault: Vault, settings: CanvasMirrorSettin
 			})
 		;
 
+		// todo: safer link parsing, considering full paths
 		const cardLinks = getMatches(cardTexts, linkPattern);
 
 		const refNodes = nodes.filter(node => node.type == 'file');
