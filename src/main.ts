@@ -9,7 +9,7 @@ const DEFAULT_SETTINGS: CanvasMirrorSettings = {
 	destination: "",
 }
 
-export default class CanvasMirrorPlugin extends Plugin {
+export default class CanvasMirror extends Plugin {
 	settings: CanvasMirrorSettings;
 
 	async onload() {
@@ -55,7 +55,7 @@ export default class CanvasMirrorPlugin extends Plugin {
 	async generateMirrors() {
 		new Notice('generating mirrors…');
 		try {
-			await mirror.generateMirrors(this.app.vault, this.settings);
+			await mirror.generateMirrors(this);
 		} catch(e) {
 			new Notice(e);
 		}
@@ -63,7 +63,7 @@ export default class CanvasMirrorPlugin extends Plugin {
 
 	async toggleMirrors() {
 		try {
-			const enabled = await mirror.toggleMirrors(this.app.vault, this.settings);
+			const enabled = await mirror.toggleMirrors(this);
 			const status = enabled ? "enabled" : "disabled"
 			new Notice(`mirrors ${status}`)
 		} catch(e) {
@@ -74,7 +74,7 @@ export default class CanvasMirrorPlugin extends Plugin {
 	async clearMirrors() {
 		new Notice('clearing mirrors…');
 		try {
-			await mirror.clearMirrors(this.app.vault, this.settings);
+			await mirror.clearMirrors(this);
 		} catch(e) {
 			new Notice(e);
 		}
@@ -82,9 +82,9 @@ export default class CanvasMirrorPlugin extends Plugin {
 }
 
 class SampleSettingTab extends PluginSettingTab {
-	plugin: CanvasMirrorPlugin;
+	plugin: CanvasMirror;
 
-	constructor(app: App, plugin: CanvasMirrorPlugin) {
+	constructor(app: App, plugin: CanvasMirror) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}

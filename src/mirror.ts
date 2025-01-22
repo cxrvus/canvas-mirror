@@ -1,5 +1,4 @@
-import { Vault } from 'obsidian';
-import { CanvasMirrorSettings } from './main';
+import CanvasMirror from './main';
 
 interface Canvas {
 	name: string,
@@ -33,12 +32,16 @@ const getMatches = (strings: string[], pattern: RegExp): string[] => {
 
 // todo: increase function uniformity by using a Self parameter
 
-export const generateMirrors = async (vault: Vault, settings: CanvasMirrorSettings) => {
+export const generateMirrors = async (self: CanvasMirror) => {
+	const vault = self.app.vault;
+	const settings = self.settings;
+
 	const { destination } = settings;
+
 	if (!destination) throw new Error('please set all folders in you settings');
 	if (!vault.getFolderByPath(destination)) vault.createFolder(destination);
 
-	const ignored = (await getAppSettings(vault)).userIgnoreFilters;
+	const ignored = (await getAppSettings(self))?.userIgnoreFilters ?? [];
 	console.log(ignored);
 
 	const sourceFiles = vault.getAllLoadedFiles();
@@ -109,7 +112,7 @@ export const generateMirrors = async (vault: Vault, settings: CanvasMirrorSettin
 		};
 	});
 
-	await clearMirrors(vault, settings);
+	await clearMirrors(self);
 
 	mirrors.forEach(mirror => {
 		const name = mirror.name.replace('.canvas', '');
@@ -122,7 +125,10 @@ export const generateMirrors = async (vault: Vault, settings: CanvasMirrorSettin
 	})
 }
 
-export const clearMirrors = async (vault: Vault, settings: CanvasMirrorSettings) => {
+export const clearMirrors = async (self: CanvasMirror) => {
+	const vault = self.app.vault;
+	const settings = self.settings;
+
 	const destDir = vault.getFolderByPath(settings.destination);
 	const oldFiles = destDir?.children?.filter(file => file.name.endsWith('.md')) ?? [];
 	oldFiles.forEach(async file => await vault.delete(file));
@@ -132,19 +138,20 @@ interface AppSettings {
 	userIgnoreFilters: string[]
 }
 
-const getAppSettings = async (vault: Vault) => {
+const getAppSettings = async (self: CanvasMirror) => {
+	const { vault } = self.app;
 	const settingsPath = `${vault.configDir}/app.json`;
 	return JSON.parse(await vault.adapter.read(settingsPath)) as AppSettings;
 }
 
-const setAppSettings = async (vault: Vault, settings: AppSettings) => {
-	const settingsPath = `${vault.configDir}/app.json`;
-	await vault.adapter.write(settingsPath, JSON.stringify(settings));
+const setAppSettings = async (self: CanvasMirror, appSettings: AppSettings) => {
+	const settingsPath = `${self.app.vault.configDir}/app.json`;
+	await self.app.vault.adapter.write(settingsPath, JSON.stringify(appSettings));
 }
 
-export const toggleMirrors = async (vault: Vault, settings: CanvasMirrorSettings): Promise<boolean> => {
-	const { destination } = settings;
-	const appSettings = await getAppSettings(vault);
+export const toggleMirrors = async (self: CanvasMirror): Promise<boolean> => {
+	const { destination } = self.settings;
+	const appSettings = await getAppSettings(self);
 
 	if (!appSettings.userIgnoreFilters) appSettings.userIgnoreFilters = [];
 
@@ -157,7 +164,7 @@ export const toggleMirrors = async (vault: Vault, settings: CanvasMirrorSettings
 		appSettings.userIgnoreFilters.push(destination)
 	}
 
-	await(setAppSettings(vault, appSettings));
+	await(setAppSettings(self, appSettings));
 
 	return enabled;
 }
