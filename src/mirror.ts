@@ -169,7 +169,7 @@ const bullet = (strings: string[]) => {
 const fmtMirror = (self: Mirror) => {
 	self.props.canvas = `[[${self.name}]]`;
 
-	// todo: infer actual value types
+	// idea: infer actual value types
 	const kvpStrings = Object.entries(self.props).map(([k, v]) => `${k}: "${v}"`);
 	const props = `---\n${kvpStrings.join('\n')}\n---\n\n`;
 
@@ -177,6 +177,7 @@ const fmtMirror = (self: Mirror) => {
 
 	const refs = bullet([self.tags, self.links].flat());
 
+	// TODO: use template
 return `\
 ${props}
 #mirror
