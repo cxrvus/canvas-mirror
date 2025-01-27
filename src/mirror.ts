@@ -181,6 +181,7 @@ const fmtMirror = (self: Mirror) => {
 	if (!self.nodes?.length) return props + '*empty*';
 
 	const refs = bullet([self.tags, self.links].flat());
+	const text = self.text.replace(/\.canvas/g, '');
 
 	// TODO: use template (parse template props, interpolate template text)
 return `\
@@ -193,7 +194,7 @@ ${refs}
 
 # Text
 
-${self.text.replace(/\.canvas/g, '')}
+${text}
 `;
 
 }
