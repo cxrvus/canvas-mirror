@@ -30,8 +30,6 @@ const getMatches = (strings: string[], pattern: RegExp): string[] => {
 	;
 }
 
-// todo: increase function uniformity by using a Self parameter
-
 export const generateMirrors = async (self: CanvasMirror) => {
 	const vault = self.app.vault;
 	const settings = self.settings;
@@ -184,7 +182,7 @@ const fmtMirror = (self: Mirror) => {
 
 	const refs = bullet([self.tags, self.links].flat());
 
-	// TODO: use template
+	// TODO: use template (parse template props, interpolate template text)
 return `\
 ${props}
 #mirror
