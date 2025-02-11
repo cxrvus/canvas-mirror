@@ -100,6 +100,8 @@ export const generateMirrors = async (self: CanvasMirror) => {
 
 		const textContent = cardTexts.join('\n\n');
 
+		// idea: generate color tags
+
 		return {
 			name,
 			nodes,
@@ -117,7 +119,7 @@ export const generateMirrors = async (self: CanvasMirror) => {
 		const path = `${destination}/${name}.md`
 		const content = fmtMirror(mirror);
 
-		// todo: only create mirror files where necessary (source has been modified)
+		// idea: only create mirror files where necessary (source has been modified)
 		// idea: fix Obsidian's indexing error
 		vault.create(path, content);
 	})
