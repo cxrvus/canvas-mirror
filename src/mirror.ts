@@ -173,6 +173,9 @@ const bullet = (strings: string[]) => {
 	return strings.length ? `- ${strings.join('\n- ')}` : '*none*';
 }
 
+// todo: new mirror format
+// idea: implement two-way conversion
+
 const fmtMirror = (self: Mirror) => {
 	self.props.canvas = `[[${self.name}]]`;
 
@@ -185,7 +188,7 @@ const fmtMirror = (self: Mirror) => {
 	const refs = bullet([self.tags, self.links].flat());
 	const text = self.text.replace(/\.canvas/g, '');
 
-	// TODO: use template (parse template props, interpolate template text)
+	// idea: use custom template (parse template props, interpolate template text)
 return `\
 ${props}
 #mirror
