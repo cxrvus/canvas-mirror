@@ -30,6 +30,7 @@ const getMatches = (strings: string[], pattern: RegExp): string[] => {
 	;
 }
 
+// TODO: refactor
 export const generateMirrors = async (self: CanvasMirror) => {
 	const vault = self.app.vault;
 	const settings = self.settings;
