@@ -1,5 +1,7 @@
 import CanvasMirror from './main';
 
+const MIRROR_TAG = "#mirror";
+
 interface Canvas {
 	name: string,
 	nodes: Node[],
@@ -184,7 +186,7 @@ const fmtMirror = (self: Mirror) => {
 	const kvpStrings = Object.entries(self.props).map(([k, v]) => `${k}: "${v}"`);
 	const props = `---\n${kvpStrings.join('\n')}\n---\n\n`;
 
-	if (!self.nodes?.length) return props + '*empty*';
+	if (!self.nodes?.length) return props + MIRROR_TAG + '\n\n*empty*';
 
 	const refs = bullet([self.tags, self.links].flat());
 	const text = self.text.replace(/\.canvas/g, '');
@@ -192,7 +194,7 @@ const fmtMirror = (self: Mirror) => {
 	// idea: use custom template (parse template props, interpolate template text)
 return `\
 ${props}
-#mirror
+${MIRROR_TAG}
 
 # References
 
