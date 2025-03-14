@@ -7,10 +7,16 @@ export interface CanvasNode {
 	file: string,
 }
 
-export interface Canvas {
+export type Canvas = {
 	name: string,
 	nodes: CanvasNode[],
+	stat: CanvasStat,
 }
+
+export type CanvasStat = {
+	ctime: number;
+	mtime: number;
+};
 
 export type Props = { [key: string]: string};
 
@@ -24,10 +30,12 @@ export const getCanvases = async (vault: Vault, sourceFiles: TAbstractFile[], ig
 
 			const content = await vault.cachedRead(file);
 			const parsedContent = content ? JSON.parse(content) : {};
+
 			const nodes = parsedContent.nodes ?? [];
 			const { name } = file;
+			const { ctime, mtime } = file.stat;
 
-			return { name, nodes }
+			return { name, nodes, stat: { ctime, mtime } }
 		})
 	);
 }

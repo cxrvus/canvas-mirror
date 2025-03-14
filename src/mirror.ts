@@ -1,4 +1,4 @@
-import { getCanvases, CanvasNode, getProps, Props, getOutlinks, LINK_PTN } from './canvas';
+import { getCanvases, CanvasNode, getProps, Props, getOutlinks, LINK_PTN, CanvasStat } from './canvas';
 import CanvasMirror from './main';
 import { getAppSettings, setAppSettings, bullet, getMatches } from './util';
 
@@ -7,9 +7,10 @@ const MIRROR_TAG = "#mirror";
 type Mirror = {
 	name: string,
 	nodes: CanvasNode[],
-	text: string,
+	stat: CanvasStat,
 	links: string[],
-	tags: string[],
+	text: string, 		// todo: remove
+	tags: string[],		// todo: remove
 	props: Props,
 }
 
@@ -29,26 +30,27 @@ export const generateMirrors = async (self: CanvasMirror) => {
 
 	const canvases = await getCanvases(vault, sourceFiles, ignored);
 
-	const mirrors: Mirror[] = canvases.map(({ name, nodes }) => {
+	const mirrors: Mirror[] = canvases.map(({ name, nodes, stat }) => {
 		const nodeTexts = nodes
 			.filter(node => node.type == 'text')
 			.map(node => node.text.trim())
 		;
 
+		// todo: remove
 		const tagPattern = /#[a-z_\/]+/g;
-
 		const sanitizedTexts = nodeTexts.map(x => x.replace(LINK_PTN, ''));
+
+		const links = getOutlinks(nodes, nodeTexts);
+		const text = nodeTexts.join('\n\n');
 		const tags = getMatches(sanitizedTexts, tagPattern);
 		const props = getProps(nodeTexts);
-		const links = getOutlinks(nodes, nodeTexts);
-
-		const text = nodeTexts.join('\n\n');
 
 		return {
 			name,
 			nodes,
-			text,
+			stat,
 			links,
+			text,
 			tags,
 			props,
 		};
@@ -62,7 +64,7 @@ export const generateMirrors = async (self: CanvasMirror) => {
 		const content = fmtMirror(mirror);
 
 		// todo: only create mirror files where necessary (source has been modified)
-		vault.create(path, content);
+		vault.create(path, content, mirror.stat);
 	})
 }
 
