@@ -1,4 +1,5 @@
 import CanvasMirror from './main';
+import { getAppSettings, setAppSettings, bullet, getMatches } from './util';
 
 const MIRROR_TAG = "#mirror";
 
@@ -24,15 +25,6 @@ type Mirror = {
 	props: Props,
 }
 
-const getMatches = (strings: string[], pattern: RegExp): string[] => {
-	return strings
-		.map(str => str.match(pattern) || '')
-		.filter(matches => matches)
-		.flat()
-	;
-}
-
-// TODO: refactor
 export const generateMirrors = async (self: CanvasMirror) => {
 	const vault = self.app.vault;
 	const settings = self.settings;
@@ -137,21 +129,6 @@ export const clearMirrors = async (self: CanvasMirror) => {
 	oldFiles.forEach(async file => await vault.delete(file));
 }
 
-interface AppSettings {
-	userIgnoreFilters: string[]
-}
-
-const getAppSettings = async (self: CanvasMirror) => {
-	const { vault } = self.app;
-	const settingsPath = `${vault.configDir}/app.json`;
-	return JSON.parse(await vault.adapter.read(settingsPath)) as AppSettings;
-}
-
-const setAppSettings = async (self: CanvasMirror, appSettings: AppSettings) => {
-	const settingsPath = `${self.app.vault.configDir}/app.json`;
-	await self.app.vault.adapter.write(settingsPath, JSON.stringify(appSettings));
-}
-
 export const toggleMirrors = async (self: CanvasMirror): Promise<boolean> => {
 	const { destination } = self.settings;
 	const appSettings = await getAppSettings(self);
@@ -170,10 +147,6 @@ export const toggleMirrors = async (self: CanvasMirror): Promise<boolean> => {
 	await(setAppSettings(self, appSettings));
 
 	return enabled;
-}
-
-const bullet = (strings: string[]) => {
-	return strings.length ? `- ${strings.join('\n- ')}` : '*none*';
 }
 
 // todo: new mirror format
