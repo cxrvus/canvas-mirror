@@ -1,24 +1,12 @@
+import { getCanvases, CanvasNode, getProps, Props, getOutlinks, LINK_PTN } from './canvas';
 import CanvasMirror from './main';
 import { getAppSettings, setAppSettings, bullet, getMatches } from './util';
 
 const MIRROR_TAG = "#mirror";
 
-interface Canvas {
-	name: string,
-	nodes: Node[],
-}
-
-interface Node {
-	type: 'text' | 'file'
-	text: string,
-	file: string,
-}
-
-type Props = { [key: string]: string};
-
 type Mirror = {
 	name: string,
-	nodes: Node[],
+	nodes: CanvasNode[],
 	text: string,
 	links: string[],
 	tags: string[],
@@ -38,68 +26,29 @@ export const generateMirrors = async (self: CanvasMirror) => {
 	console.log(ignored);
 
 	const sourceFiles = vault.getAllLoadedFiles();
-	const canvases: Canvas[] = await Promise.all(sourceFiles
-		.filter(file => !ignored.some(x => file.path.startsWith(x)))
-		.filter(abstractFile => abstractFile.name.endsWith('.canvas'))
-		.map(async abstractFile => {
-			const file = vault.getFileByPath(abstractFile.path);
-			if (!file) throw new Error();
 
-			const content = await vault.cachedRead(file);
-			const parsedContent = content ? JSON.parse(content) : {};
-			const nodes = parsedContent.nodes ?? [];
-			const { name } = file;
-
-			return { name, nodes }
-		})
-	);
+	const canvases = await getCanvases(vault, sourceFiles, ignored);
 
 	const mirrors: Mirror[] = canvases.map(({ name, nodes }) => {
-		const cardNodes = nodes.filter(node => node.type == 'text');
-		const cardTexts = cardNodes.map(node => node.text.trim());
+		const nodeTexts = nodes
+			.filter(node => node.type == 'text')
+			.map(node => node.text.trim())
+		;
 
 		const tagPattern = /#[a-z_\/]+/g;
-		const linkPattern = /\[\[.*?\]\]|\[.*?\]\(.*?\)/g;
-		const propPattern = /(\[|\()([a-z-_]+?)::(.+)(\)|\])/g;
 
-		const sanitizedTexts = cardTexts.map(x => x.replace(linkPattern, ''));
+		const sanitizedTexts = nodeTexts.map(x => x.replace(LINK_PTN, ''));
 		const tags = getMatches(sanitizedTexts, tagPattern);
-		const propStrings = getMatches(cardTexts, propPattern);
-		
-		const props: Props = {};
+		const props = getProps(nodeTexts);
+		const links = getOutlinks(nodes, nodeTexts);
 
-		propStrings
-			.map(kvp => kvp.split('::'))
-			.forEach(([k, v]) => {
-				v = v.trim();
-				props[k.substring(1)] = v.substring(0, v.length - 1);
-			})
-		;
-
-		// idea: safer link parsing, considering full paths
-		const cardLinks = getMatches(cardTexts, linkPattern);
-
-		const refNodes = nodes.filter(node => node.type == 'file');
-		const refPaths = refNodes.map(node => node.file);
-
-		const refLinks = refPaths
-			.map(path => path.replace(/^.*\//, ''))
-			.map(name => `[[${name}]]`)
-			.map(link => link.replace('.md', ''))
-		;
-
-		const rawOutgoingLinks = [...cardLinks, ...refLinks];
-
-		// for referenced canvas files, link to mirror files instead
-		const outgoingLinks = rawOutgoingLinks.map(links => links.replace('.canvas', ''));
-
-		const textContent = cardTexts.join('\n\n');
+		const text = nodeTexts.join('\n\n');
 
 		return {
 			name,
 			nodes,
-			text: textContent,
-			links: outgoingLinks,
+			text,
+			links,
 			tags,
 			props,
 		};
