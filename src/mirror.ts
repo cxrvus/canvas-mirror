@@ -76,7 +76,7 @@ export const generateMirrors = async (self: CanvasMirror) => {
 			})
 		;
 
-		// todo: safer link parsing, considering full paths
+		// idea: safer link parsing, considering full paths
 		const cardLinks = getMatches(cardTexts, linkPattern);
 
 		const refNodes = nodes.filter(node => node.type == 'file');
@@ -95,8 +95,6 @@ export const generateMirrors = async (self: CanvasMirror) => {
 
 		const textContent = cardTexts.join('\n\n');
 
-		// idea: generate color tags
-
 		return {
 			name,
 			nodes,
@@ -114,8 +112,7 @@ export const generateMirrors = async (self: CanvasMirror) => {
 		const path = `${destination}/${name}.md`
 		const content = fmtMirror(mirror);
 
-		// idea: only create mirror files where necessary (source has been modified)
-		// idea: fix Obsidian's indexing error
+		// todo: only create mirror files where necessary (source has been modified)
 		vault.create(path, content);
 	})
 }
@@ -150,7 +147,7 @@ export const toggleMirrors = async (self: CanvasMirror): Promise<boolean> => {
 }
 
 // todo: new mirror format
-// idea: implement two-way conversion
+// todo: implement two-way conversion
 
 const fmtMirror = (self: Mirror) => {
 	self.props.canvas = `[[${self.name}]]`;
@@ -163,8 +160,6 @@ const fmtMirror = (self: Mirror) => {
 
 	const refs = bullet([self.tags, self.links].flat());
 	const text = self.text.replace(/\.canvas/g, '');
-
-	// idea: use custom template (parse template props, interpolate template text)
 return `\
 ${props}
 ${MIRROR_TAG}
