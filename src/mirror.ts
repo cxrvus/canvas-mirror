@@ -10,7 +10,6 @@ type Mirror = {
 	stat: CanvasStat,
 	links: string[],
 	text: string, 		// todo: remove
-	tags: string[],		// todo: remove
 	props: Props,
 }
 
@@ -36,13 +35,8 @@ export const generateMirrors = async (self: CanvasMirror) => {
 			.map(node => node.text.trim())
 		;
 
-		// todo: remove
-		const tagPattern = /#[a-z_\/]+/g;
-		const sanitizedTexts = nodeTexts.map(x => x.replace(LINK_PTN, ''));
-
 		const links = getOutlinks(nodes, nodeTexts);
 		const text = nodeTexts.join('\n\n');
-		const tags = getMatches(sanitizedTexts, tagPattern);
 		const props = getProps(nodeTexts);
 
 		return {
@@ -51,7 +45,6 @@ export const generateMirrors = async (self: CanvasMirror) => {
 			stat,
 			links,
 			text,
-			tags,
 			props,
 		};
 	});
@@ -109,17 +102,17 @@ const fmtMirror = (self: Mirror) => {
 
 	if (!self.nodes?.length) return props + MIRROR_TAG + '\n\n*empty*';
 
-	const refs = bullet([self.tags, self.links].flat());
+	const links = bullet(self.links);
 	const text = self.text.replace(/\.canvas/g, '');
 return `\
 ${props}
 ${MIRROR_TAG}
 
-# References
+# Links
 
-${refs}
+${links}
 
-# Text
+# Nodes
 
 ${text}
 `;
