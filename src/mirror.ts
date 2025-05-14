@@ -30,6 +30,7 @@ export const generateMirrors = async (self: CanvasMirror) => {
 	const canvases = await getCanvases(vault, sourceFiles, ignored);
 
 	const mirrors: Mirror[] = canvases.map(({ name, nodes, stat }) => {
+		// fixme: this probably returns "[Object Object]"
 		const nodeTexts = nodes
 			.filter(node => node.type == 'text')
 			.map(node => node.text.trim())
