@@ -59,8 +59,7 @@ export const generateMirrors = async (self: CanvasMirror) => {
 	await clearMirrors(self);
 
 	mirrors.forEach(mirror => {
-		// plus sign prefix to put mirror files at the top of backlinks lists
-		const name = '+ ' + mirror.name.replace('.canvas', '');
+		const name = mirror.name.replace('.canvas', '');
 		const path = `${destination}/${name}.md`
 		const content = fmtMirror(mirror);
 
