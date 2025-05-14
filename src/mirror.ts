@@ -98,6 +98,13 @@ export const toggleMirrors = async (self: CanvasMirror): Promise<boolean> => {
 	return enabled;
 }
 
+const sanitizeCanvasLinks = (str: string): string => {
+	return str.replace(/\[\[([^\]|]+)\.canvas(\|[^\]]*)?\]\]/g, (_, file, alias) => {
+		const display = alias ? alias.slice(1) : file;
+		return `[[+ ${file}|${display}]]`;
+	});
+}
+
 // todo: new mirror format
 // todo: implement two-way conversion
 
@@ -110,8 +117,8 @@ const fmtMirror = (self: Mirror) => {
 
 	if (!self.nodes?.length) return props + MIRROR_TAG + '\n\n*empty*';
 
-	const refs = bullet([self.tags, self.links].flat());
-	const text = self.text.replace(/\.canvas/g, '');
+	const refs = sanitizeCanvasLinks(bullet([self.tags, self.links].flat()));
+	const text = sanitizeCanvasLinks(self.text);
 return `\
 ${props}
 ${MIRROR_TAG}

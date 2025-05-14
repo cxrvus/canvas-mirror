@@ -73,10 +73,5 @@ export const getOutlinks = (nodes: CanvasNode[], nodeTexts: string[]) => {
 		.map(link => link.replace('.md', ''))
 	;
 
-	const rawOutgoingLinks = [...cardLinks, ...refLinks];
-
-	// for referenced canvas files, link to mirror files instead
-	const outgoingLinks = rawOutgoingLinks.map(links => links.replace('.canvas', ''));
-
-	return outgoingLinks;
+	return [...cardLinks, ...refLinks];
 }
